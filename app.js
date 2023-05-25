@@ -43,6 +43,10 @@ app.get("/", (req, res) => {
     },
   });
 });
+
+const user = require("./routes/userRoute");
+app.use("/api/v1/user", user);
+
 app.use(errorMiddleware);
 
 module.exports = app;

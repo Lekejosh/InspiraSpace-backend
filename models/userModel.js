@@ -1,0 +1,97 @@
+const mongoose = require("mongoose");
+const validator = require("validator");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
+
+const userSchema = new mongoose.Schema(
+  {
+    _id: {
+      type: String, // Set the type to String for UUID
+      required: true, // Ensure the _id field is required
+      default: function genUUID() {
+        // Generate a UUID when a new document is created
+        return require("uuid").v4();
+      },
+    },
+    firstName: {
+      type: String,
+      required: [true, "Please Enter First Name"],
+      maxLength: [20, "First Name Cannot exceed 20 Characters"],
+    },
+    lastName: {
+      type: String,
+      required: [true, "Please Enter Last Name"],
+      maxLength: [20, "Last Name Cannot exceed 20 Characters"],
+    },
+    email: {
+      type: String,
+      required: [true, "Please Enter Email"],
+      unique: true,
+      validate: [validator.isEmail, "Please Enter a valid Email Address"],
+    },
+    password: {
+      type: String,
+      required: [true, "Please Enter your Password"],
+      minLength: [8, "Password should be 8 characters or more"],
+      select: false,
+    },
+    isVerified: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+
+    mobileNumber: {
+      type: String,
+    },
+
+    avatar: {
+      public_id: { type: String },
+      url: { type: String },
+    },
+    role: {
+      type: String,
+      enum: ["user", "seller", "admin"],
+      default: "user",
+    },
+    generatedOtp: String,
+    generatedOtpExpire: Date,
+    resetPasswordToken: String,
+    resetPasswordExpire: Date,
+  },
+  {
+    timestamps: true,
+  }
+);
+
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) {
+    next();
+  }
+  this.password = await bcrypt.hash(this.password, 10);
+});
+
+userSchema.methods.getAccessToken = function () {
+  return jwt.sign({ id: this._id }, process.env.ACCESS_TOKEN_SECRET, {
+    expiresIn: process.env.ACCESS_TOKEN_EXPIRE,
+  });
+};
+
+userSchema.methods.comparePassword = async function (enteredPassword) {
+  return await bcrypt.compare(enteredPassword, this.password);
+};
+
+userSchema.methods.getResetPasswordToken = function () {
+  const resetToken = crypto.randomBytes(20).toString("hex");
+
+  this.resetPasswordToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+
+  this.resetPasswordExpire = Date.now() + 15 * 60 * 1000;
+  return resetToken;
+};
+
+module.exports = mongoose.model("User", userSchema);
