@@ -46,8 +46,12 @@ const userSchema = new mongoose.Schema(
     },
 
     avatar: {
-      public_id: { type: String },
-      url: { type: String },
+      public_id: { type: String, default: "default_image" },
+      url: {
+        type: String,
+        default:
+          "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
+      },
     },
     bio: {
       type: String,

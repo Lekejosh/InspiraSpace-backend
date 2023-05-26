@@ -11,6 +11,8 @@ const {
   updateProfile,
   forgotPassword,
   resetPassword,
+  updateAvatar,
+  removeAvatar,
 } = require("../controllers/userController");
 const { isAuthenticatedUser } = require("../middlewares/auth");
 
@@ -24,7 +26,11 @@ router
   .route("/email/verify")
   .put(isAuthenticatedUser, verifyEmail)
   .get(isAuthenticatedUser, resendOtp);
-  router.route('/password/forgot').get(forgotPassword)
-  router.route('/password/reset/:token').put(resetPassword)
+router.route("/password/forgot").get(forgotPassword);
+router.route("/password/reset/:token").put(resetPassword);
+router
+  .route("/update/avatar")
+  .put(isAuthenticatedUser, updateAvatar)
+  .delete(isAuthenticatedUser, removeAvatar);
 router.route("/logout").post(isAuthenticatedUser, logoutUser);
 module.exports = router;

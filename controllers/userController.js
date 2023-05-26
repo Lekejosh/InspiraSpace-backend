@@ -285,3 +285,52 @@ exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
     .status(200)
     .json({ success: true, message: "Password Changed Successfully" });
 });
+
+exports.updateAvatar = catchAsyncErrors(async(req,res,next)=>{
+   const user = await User.findById(req.user.id);
+
+   if (!user) {
+     return next(new ErrorHandler("User not found", 404));
+   }
+   if (user.avatar.public_id !== "default_image") {
+     await cloudinary.v2.uploader.destroy(user.avatar.public_id);
+   }
+
+   const result = await cloudinary.v2.uploader.upload(req.file.path, {
+     folder: "Chat_app_avatar",
+     width: 150,
+     crop: "scale",
+   });
+
+   user.avatar = {
+     public_id: result.public_id,
+     url: result.secure_url,
+   };
+
+   await user.save();
+
+   res.status(200).json({
+     success: true,
+   });
+})
+
+exports.removeAvatar = catchAsyncErrors(async (req, res, next) => {
+  const user = await User.findById(req.user.id);
+
+  if (!user) {
+    return next(new ErrorHandler("User not found", 404));
+  }
+
+  await cloudinary.v2.uploader.destroy(user.avatar.public_id);
+
+  user.avatar = {
+    public_id: "default_image",
+    url: "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
+  };
+
+  await user.save();
+
+  res.status(200).json({
+    success: true,
+  });
+});
