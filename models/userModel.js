@@ -52,16 +52,20 @@ const userSchema = new mongoose.Schema(
     bio: {
       type: String,
     },
-    location:{
-      country:{
-        type:String
+    location: {
+      country: {
+        type: String,
       },
-      state:{
-        type:String
+      state: {
+        type: String,
       },
-      postalCode:{
-        type:String
-      }
+      postalCode: {
+        type: String,
+      },
+    },
+    isDeactivated: {
+      type: Boolean,
+      default: false,
     },
     role: {
       type: String,

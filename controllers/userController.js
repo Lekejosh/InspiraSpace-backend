@@ -60,7 +60,7 @@ exports.verifyEmail = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("User not found", 404));
   }
   if (user.isVerified) {
-    return next(new ErrorHandler("Account Already Verified", 400));
+    return next(new ErrorHandler("Account Already Verified", 406));
   }
   if (otp !== user.generatedOtp || user.generatedOtpExpire <= now) {
     return next(new ErrorHandler("Otp is invalid or Expired", 400));
@@ -184,4 +184,104 @@ exports.updateProfile = catchAsyncErrors(async (req, res, next) => {
   await user.save();
 
   res.status(200).json({ success: true, user });
+});
+
+exports.updatePassword = catchAsyncErrors(async (req, res, next) => {
+  const { oldPassword, newPassword, confirmPassword } = req.body;
+
+  const user = await User.findById(req.user.id).select("+password");
+  const isPasswordMatched = await user.comparePassword(oldPassword);
+
+  if (!isPasswordMatched)
+    return next(new ErrorHandler("Current Password is wrong!!!", 400));
+
+  if (newPassword !== confirmPassword)
+    return next(
+      new ErrorHandler("New Password and Confirm Password does not match", 400)
+    );
+
+  user.password = newPassword;
+  user.save();
+
+  res
+    .status(200)
+    .json({ success: true, message: "Password Update Successfully" });
+});
+
+exports.forgotPassword = catchAsyncErrors(async (req, res, next) => {
+  const { emailNumb } = req.body;
+
+  if (!emailNumb)
+    return next(new ErrorHandler("Please Provide Email/Mobile Number", 400));
+
+  const user = await User.findOne({
+    $or: [{ email: emailNumb }, { mobileNumber: emailNumb }],
+  });
+
+  if (!user) {
+    return next(new ErrorHandler("User Not found", 404));
+  }
+
+  if (user.isDeactivated) {
+    return next(new ErrorHandler("Account Deactivated, Contact Support", 403));
+  }
+
+  const resetToken = user.getResetPasswordToken();
+  user.save({ ValidateBeforeSave: false });
+
+  const resetPasswordUrl = `${req.protocol}://${req.get(
+    "host"
+  )}/password/reset/${resetToken}`;
+
+  const message = `Your password reset Token is :-\n\n ${resetPasswordUrl} \n\nif you have not requested this email then, please Ignore it`;
+  try {
+    await sendEmail({
+      email: user.email,
+      subject: `User Password Recovery`,
+      html: message,
+    });
+  } catch (error) {
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+
+    await user.save({ validateBeforeSave: false });
+    return next(new ErrorHandler(error.message, 500));
+  }
+  res
+    .status(200)
+    .json({ success: true, message: "Reset Link Sent, Check your Mail!" });
+});
+
+exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
+  const resetPasswordToken = crypto
+    .createHash("sha256")
+    .update(req.params.token)
+    .digest("hex");
+
+  const user = await User.findOne({
+    resetPasswordToken,
+    resetPasswordExpire: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    return next(new ErrorHandler("Reset Password Token is invalid", 401));
+  }
+
+  if (req.body.newPassword !== req.body.confirmPassword) {
+    return next(new ErrorHandler("Password does not Match", 400));
+  }
+  const message = `Your password has been changed successfully`;
+  await sendEmail({
+    email: user.email,
+    subject: `Password Changed Successfully`,
+    html: message,
+  });
+  user.password = req.body.newPassword;
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpire = undefined;
+
+  await user.save();
+  res
+    .status(200)
+    .json({ success: true, message: "Password Changed Successfully" });
 });

@@ -9,6 +9,8 @@ const {
   resendOtp,
   logoutUser,
   updateProfile,
+  forgotPassword,
+  resetPassword,
 } = require("../controllers/userController");
 const { isAuthenticatedUser } = require("../middlewares/auth");
 
@@ -21,6 +23,8 @@ router
 router
   .route("/email/verify")
   .put(isAuthenticatedUser, verifyEmail)
-  .get(resendOtp);
+  .get(isAuthenticatedUser, resendOtp);
+  router.route('/password/forgot').get(forgotPassword)
+  router.route('/password/reset/:token').put(resetPassword)
 router.route("/logout").post(isAuthenticatedUser, logoutUser);
 module.exports = router;
