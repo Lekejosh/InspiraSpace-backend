@@ -7,10 +7,9 @@ const crypto = require("crypto");
 const userSchema = new mongoose.Schema(
   {
     _id: {
-      type: String, // Set the type to String for UUID
-      required: true, // Ensure the _id field is required
+      type: String,
+      required: true,
       default: function genUUID() {
-        // Generate a UUID when a new document is created
         return require("uuid").v4();
       },
     },
@@ -50,9 +49,23 @@ const userSchema = new mongoose.Schema(
       public_id: { type: String },
       url: { type: String },
     },
+    bio: {
+      type: String,
+    },
+    location:{
+      country:{
+        type:String
+      },
+      state:{
+        type:String
+      },
+      postalCode:{
+        type:String
+      }
+    },
     role: {
       type: String,
-      enum: ["user", "seller", "admin"],
+      enum: ["user", "admin"],
       default: "user",
     },
     generatedOtp: String,
