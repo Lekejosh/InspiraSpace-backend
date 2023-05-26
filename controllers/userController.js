@@ -4,7 +4,6 @@ const ErrorHandler = require("../utils/errorHandler");
 const sendEmail = require("../utils/sendMail");
 const catchAsyncErrors = require("../middlewares/catchAsyncErrors");
 const sendToken = require("../utils/jwtToken");
-const { v4: uuidv4 } = require("uuid");
 // const { generateOTP } = require("../utils/otpGenerator");
 const cloudinary = require("cloudinary");
 const jwt = require("jsonwebtoken");
@@ -62,7 +61,11 @@ exports.loginUser = catchAsyncErrors(async (req, res, next) => {
 
 exports.getUser = catchAsyncErrors(async (req, res, next) => {
   const { id } = req.params;
+  if (!id) return next(new ErrorHandler("Please Provide all credentials", 400));
 
   const user = await User.findById(id);
+
+  if (!user) return next(new ErrorHandler("User not found", 404));
+
   res.status(200).json({ user });
 });
