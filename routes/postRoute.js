@@ -7,6 +7,9 @@ const {
   deletePost,
   likePost,
   unlikePost,
+  createPostReview,
+  getPostReviews,
+  deletePostReview,
 } = require("../controllers/postController");
 
 const { isAuthenticatedUser } = require("../middlewares/auth");
@@ -20,5 +23,11 @@ router
   .route("/like/:postId")
   .put(isAuthenticatedUser, likePost)
   .delete(isAuthenticatedUser, unlikePost);
+
+router
+  .route("/review/:postId")
+  .put(isAuthenticatedUser, createPostReview)
+  .get((isAuthenticatedUser, getPostReviews))
+  .delete(isAuthenticatedUser, deletePostReview);
 
 module.exports = router;

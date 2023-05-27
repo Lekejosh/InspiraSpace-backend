@@ -33,6 +33,10 @@ const postSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    numOfReviews: {
+      type: Number,
+      default: 0,
+    },
     author: {
       type: String,
       ref: "User",
@@ -58,6 +62,13 @@ const postSchema = new mongoose.Schema(
         comment: {
           type: String,
           required: true,
+        },
+        _id: {
+          type: String,
+          required: true,
+          default: function genUUID() {
+            return require("uuid").v4();
+          },
         },
       },
     ],
