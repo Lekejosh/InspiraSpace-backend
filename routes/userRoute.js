@@ -16,6 +16,8 @@ const {
 } = require("../controllers/userController");
 const { isAuthenticatedUser } = require("../middlewares/auth");
 
+const upload = require('../utils/multer')
+
 router.route("/register").post(registerUser);
 router.route("/login").post(loginUser);
 router
@@ -30,7 +32,7 @@ router.route("/password/forgot").get(forgotPassword);
 router.route("/password/reset/:token").put(resetPassword);
 router
   .route("/update/avatar")
-  .put(isAuthenticatedUser, updateAvatar)
+  .put(upload.single("avatar"),isAuthenticatedUser, updateAvatar)
   .delete(isAuthenticatedUser, removeAvatar);
 router.route("/logout").post(isAuthenticatedUser, logoutUser);
 module.exports = router;

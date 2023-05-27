@@ -9,17 +9,31 @@ const cloudinary = require("cloudinary");
 const jwt = require("jsonwebtoken");
 
 exports.registerUser = catchAsyncErrors(async (req, res, next) => {
-  const { firstName, lastName, email, password, mobileNumber } = req.body;
+  const { firstName, lastName, username, email, password, mobileNumber } =
+    req.body;
 
-  const existingUser = await User.findOne({ email: email });
+  const checkExistingUser = async (key, value) => {
+    const existingUser = await User.findOne({ [key]: value });
+    if (existingUser) {
+      return `${key} ${value} is already taken.`;
+    }
+  };
 
-  if (existingUser)
-    return next(new ErrorHandler("Email already existing, Please Login", 409));
+  const errors = await Promise.all([
+    checkExistingUser("email", email),
+    checkExistingUser("username", username),
+  ]);
+
+  const error = errors.find((e) => e);
+  if (error) {
+    return next(new ErrorHandler(error, 409));
+  }
 
   const user = await User.create({
     firstName,
     lastName,
     email,
+    username,
     password,
     mobileNumber,
     generatedOtp: generateOTP(),
@@ -286,33 +300,35 @@ exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
     .json({ success: true, message: "Password Changed Successfully" });
 });
 
-exports.updateAvatar = catchAsyncErrors(async(req,res,next)=>{
-   const user = await User.findById(req.user.id);
+exports.updateAvatar = catchAsyncErrors(async (req, res, next) => {
+  if (!req.body.avatar) return next(new ErroHandler("Unexpected Field", 422));
+  const user = await User.findById(req.user.id);
 
-   if (!user) {
-     return next(new ErrorHandler("User not found", 404));
-   }
-   if (user.avatar.public_id !== "default_image") {
-     await cloudinary.v2.uploader.destroy(user.avatar.public_id);
-   }
+  if (!user) {
+    return next(new ErrorHandler("User not found", 404));
+  }
+  if (user.avatar.public_id !== "default_image") {
+    await cloudinary.v2.uploader.destroy(user.avatar.public_id);
+  }
 
-   const result = await cloudinary.v2.uploader.upload(req.file.path, {
-     folder: "Chat_app_avatar",
-     width: 150,
-     crop: "scale",
-   });
+  const result = await cloudinary.v2.uploader.upload(req.file.path, {
+    folder: "Chat_app_avatar",
+    width: 150,
+    crop: "scale",
+  });
 
-   user.avatar = {
-     public_id: result.public_id,
-     url: result.secure_url,
-   };
+  user.avatar = {
+    public_id: result.public_id,
+    url: result.secure_url,
+  };
 
-   await user.save();
+  await user.save();
 
-   res.status(200).json({
-     success: true,
-   });
-})
+  res.status(200).json({
+    success: true,
+    message: "User Avatar Updated Successfully",
+  });
+});
 
 exports.removeAvatar = catchAsyncErrors(async (req, res, next) => {
   const user = await User.findById(req.user.id);
@@ -332,5 +348,6 @@ exports.removeAvatar = catchAsyncErrors(async (req, res, next) => {
 
   res.status(200).json({
     success: true,
+    message: "Avatar Deleted Successfully",
   });
 });

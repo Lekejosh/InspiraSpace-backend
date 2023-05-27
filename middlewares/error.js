@@ -27,6 +27,11 @@ module.exports = (err, req, res, next) => {
     err = new ErrorHandler(message, 403);
   }
 
+  if (err.message === "Unexpected field") {
+    const message = `Unexpected field`;
+    err = new ErrorHandler(message, 422);
+  }
+
   res.status(err.statusCode).json({
     success: false,
     message: err.message,
