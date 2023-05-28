@@ -13,26 +13,32 @@ const {
   resetPassword,
   updateAvatar,
   removeAvatar,
+  deactivateAccount,
+  activateAccount,
 } = require("../controllers/userController");
-const { isAuthenticatedUser } = require("../middlewares/auth");
+const { isAuthenticatedUser, deactivated } = require("../middlewares/auth");
 
-const upload = require('../utils/multer')
+const upload = require("../utils/multer");
 
 router.route("/register").post(registerUser);
 router.route("/login").post(loginUser);
 router
   .route("/me")
-  .get(isAuthenticatedUser, getUser)
-  .put(isAuthenticatedUser, updateProfile);
+  .get(isAuthenticatedUser, deactivated, getUser)
+  .put(isAuthenticatedUser, deactivated, updateProfile);
 router
   .route("/email/verify")
-  .put(isAuthenticatedUser, verifyEmail)
-  .get(isAuthenticatedUser, resendOtp);
+  .put(isAuthenticatedUser, deactivated, verifyEmail)
+  .get(isAuthenticatedUser, deactivated, resendOtp);
 router.route("/password/forgot").get(forgotPassword);
 router.route("/password/reset/:token").put(resetPassword);
 router
   .route("/update/avatar")
-  .put(upload.single("avatar"),isAuthenticatedUser, updateAvatar)
-  .delete(isAuthenticatedUser, removeAvatar);
-router.route("/logout").post(isAuthenticatedUser, logoutUser);
+  .put(upload.single("avatar"), isAuthenticatedUser, deactivated, updateAvatar)
+  .delete(isAuthenticatedUser, deactivated, removeAvatar);
+router.route("/logout").post(isAuthenticatedUser, deactivated, logoutUser);
+router
+  .route("/account/deactivate")
+  .get(isAuthenticatedUser, deactivated, deactivateAccount);
+router.route("/account/activate").get(isAuthenticatedUser, activateAccount);
 module.exports = router;

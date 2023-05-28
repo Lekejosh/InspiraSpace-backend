@@ -351,3 +351,24 @@ exports.removeAvatar = catchAsyncErrors(async (req, res, next) => {
     message: "Avatar Deleted Successfully",
   });
 });
+
+exports.deactivateAccount = catchAsyncErrors(async (req, res, next) => {
+  const user = await User.findById(req.user._id);
+
+  user.isDeactivated = true;
+  await user.save();
+
+  res
+    .status(200)
+    .json({ success: true, message: "Account Deactivated successfully" });
+});
+
+exports.activateAccount = catchAsyncErrors(async (req, res, next) => {
+  const user = await User.findById(req.user._id);
+
+  user.isDeactivated = false;
+
+  res
+    .status(200)
+    .json({ success: true, message: "Account is activated successfully" });
+});

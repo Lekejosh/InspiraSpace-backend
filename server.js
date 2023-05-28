@@ -6,6 +6,8 @@
 const app = require("./app");
 const mongoose = require("mongoose");
 const cloudinary = require("cloudinary");
+const cluster = require("cluster");
+const os = require("os");
 require("dotenv").config();
 
 process.on("uncaughtException", (err) => {
@@ -21,6 +23,15 @@ cloudinary.config({
 });
 
 mongoose.set("strictQuery", true);
+
+// console.log("Server is runningggg");
+// if (cluster.isMaster) {
+//   const NUM_WORKERS = os.cpus().length;
+//   console.log(NUM_WORKERS);
+//   for (let i = 0; i < NUM_WORKERS; i++) {
+//     cluster.fork();
+//   }
+// }
 
 mongoose
   .connect(`${process.env.DB_URI}/${process.env.DB_NAME}`)
@@ -41,4 +52,3 @@ process.on("unhandledRejection", (err) => {
     process.exit(1);
   });
 });
-    

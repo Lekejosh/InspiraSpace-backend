@@ -25,3 +25,12 @@ exports.authorizeRole = (...roles) => {
     next();
   };
 };
+exports.deactivated = catchAsyncErrors(async (req, res, next) => {
+  const user = await User.findById(req.user._id);
+
+  if (user.isDeactivated) {
+    return next(new ErrorHandler("You account has been deactivated",401));
+  }
+
+  next();
+});
