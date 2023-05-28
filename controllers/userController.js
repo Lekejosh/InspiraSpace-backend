@@ -312,7 +312,7 @@ exports.updateAvatar = catchAsyncErrors(async (req, res, next) => {
   }
 
   const result = await cloudinary.v2.uploader.upload(req.file.path, {
-    folder: "Chat_app_avatar",
+    folder: "InspiraSpace",
     width: 150,
     crop: "scale",
   });
@@ -371,4 +371,20 @@ exports.activateAccount = catchAsyncErrors(async (req, res, next) => {
   res
     .status(200)
     .json({ success: true, message: "Account is activated successfully" });
+});
+
+exports.searchUser = catchAsyncErrors(async (req, res, next) => {
+//TODO: Fix this
+
+  // const users = await User.find().find({ _id: { $ne: req.user._id } });
+
+  // const mainUser = await User.findById(req.user._id);
+
+  // const filtered = mainUser.blocked.filter(
+  //   blocked.forEach((user) => {
+  //     user != users._id;
+  //   })
+  // );
+
+  // res.status(200).json({ success: true, users: filtered });
 });

@@ -15,6 +15,7 @@ const {
   removeAvatar,
   deactivateAccount,
   activateAccount,
+  searchUser,
 } = require("../controllers/userController");
 const { isAuthenticatedUser, deactivated } = require("../middlewares/auth");
 
@@ -41,4 +42,5 @@ router
   .route("/account/deactivate")
   .get(isAuthenticatedUser, deactivated, deactivateAccount);
 router.route("/account/activate").get(isAuthenticatedUser, activateAccount);
+router.route("/search").get(isAuthenticatedUser, searchUser);
 module.exports = router;
