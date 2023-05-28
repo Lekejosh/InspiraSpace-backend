@@ -21,7 +21,7 @@ const orderSchema = new mongoose.Schema(
         enum: ["paid", "fail", "processing"],
         default: "processing",
       },
-      _id: String,
+      refrence: String,
     },
     items: [
       {
@@ -52,6 +52,10 @@ const orderSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    user:{
+      type:String,
+      ref:"User"
+    }
   },
   {
     timestamps: true,

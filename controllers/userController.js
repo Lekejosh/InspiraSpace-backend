@@ -367,6 +367,7 @@ exports.activateAccount = catchAsyncErrors(async (req, res, next) => {
   const user = await User.findById(req.user._id);
 
   user.isDeactivated = false;
+  await user.save();
 
   res
     .status(200)
@@ -374,17 +375,13 @@ exports.activateAccount = catchAsyncErrors(async (req, res, next) => {
 });
 
 exports.searchUser = catchAsyncErrors(async (req, res, next) => {
-//TODO: Fix this
-
+  //TODO: Fix this
   // const users = await User.find().find({ _id: { $ne: req.user._id } });
-
   // const mainUser = await User.findById(req.user._id);
-
   // const filtered = mainUser.blocked.filter(
   //   blocked.forEach((user) => {
   //     user != users._id;
   //   })
   // );
-
   // res.status(200).json({ success: true, users: filtered });
 });
