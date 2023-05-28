@@ -10,7 +10,9 @@ const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const bodyParser = require("body-parser");
 const errorMiddleware = require("./middlewares/error");
+const helmet = require('helmet')
 
+app.use(helmet())
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -46,8 +48,10 @@ app.get("/", (req, res) => {
 
 const user = require("./routes/userRoute");
 const post = require("./routes/postRoute");
+const follow = require("./routes/followRoute");
 app.use("/api/v1/user", user);
 app.use("/api/v1/post", post);
+app.use("/api/v1/follow", follow);
 
 app.use(errorMiddleware);
 
