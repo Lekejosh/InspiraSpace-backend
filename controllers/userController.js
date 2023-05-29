@@ -44,21 +44,21 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
     },
   });
 
-  try {
-    const data = `Your email Verification Token is :-\n\n ${user.generatedOtp} (This is only availbale for 15 Minutes!)\n\nif you have not requested this email  then, please Ignore it`;
-    await sendEmail({
-      email: `${user.firstName} <${user.email}>`,
-      subject: "Veritfy Account",
-      html: data,
-    }).then(() => {
-      console.log("Email Sent Successfully");
-    });
-  } catch (err) {
-    user.generatedOtp = undefined;
-    user.generatedOtpExpire = undefined;
-    await user.save({ validateBeforeSave: false });
-    return next(new ErrorHandler(err.message, 500));
-  }
+  // try {
+  //   const data = `Your email Verification Token is :-\n\n ${user.generatedOtp} (This is only availbale for 15 Minutes!)\n\nif you have not requested this email  then, please Ignore it`;
+  //   await sendEmail({
+  //     email: `${user.firstName} <${user.email}>`,
+  //     subject: "Veritfy Account",
+  //     html: data,
+  //   }).then(() => {
+  //     console.log("Email Sent Successfully");
+  //   });
+  // } catch (err) {
+  //   user.generatedOtp = undefined;
+  //   user.generatedOtpExpire = undefined;
+  //   await user.save({ validateBeforeSave: false });
+  //   return next(new ErrorHandler(err.message, 500));
+  // }
 
   user.getAccessToken();
 
@@ -126,9 +126,9 @@ exports.resendOtp = catchAsyncErrors(async (req, res, next) => {
 });
 
 exports.loginUser = catchAsyncErrors(async (req, res, next) => {
-  const { emailNumb, password } = req.body;
+  const { emailNumbName, password } = req.body;
 
-  if (!emailNumb || !password)
+  if (!emailNumbName || !password)
     return next(
       new ErrorHandler(
         "Please enter your Email/Mobile Number and Password",
@@ -137,7 +137,7 @@ exports.loginUser = catchAsyncErrors(async (req, res, next) => {
     );
 
   const user = await User.findOne({
-    $or: [{ email: emailNumb }, { mobileNumber: emailNumb }],
+    $or: [{ email: emailNumbName }, { mobileNumber: emailNumbName },{username:emailNumbName}],
   }).select("+password");
 
   if (!user) return next(new ErrorHandler("Invalid Credentials", 401));
@@ -376,13 +376,13 @@ exports.activateAccount = catchAsyncErrors(async (req, res, next) => {
 
 exports.searchUser = catchAsyncErrors(async (req, res, next) => {
   //TODO: Fix this
-  // const users = await User.find().find({ _id: { $ne: req.user._id } });
+  const users = await User.find().find({ _id: { $ne: req.user._id } });
   // const mainUser = await User.findById(req.user._id);
   // const filtered = mainUser.blocked.filter(
   //   blocked.forEach((user) => {
   //     user != users._id;
   //   })
   // );
-  // res.status(200).json({ success: true, users: filtered });
+  res.status(200).json({ success: true, users });
 });
 

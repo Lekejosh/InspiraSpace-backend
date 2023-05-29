@@ -27,9 +27,8 @@ exports.followUser = catchAsyncErrors(async (req, res, next) => {
   if (checkIfFollowingUserIsNotBlock)
     return next(new ErrorHandler("This user has already blocked you😔", 401));
 
-  const checkIfRequestingFollowUserHasBlockedTheOtherUser = user.blocked.find(
-    (user) => user == userId
-  );
+  const checkIfRequestingFollowUserHasBlockedTheOtherUser =
+    user.blocked.includes(userId);
 
   if (checkIfRequestingFollowUserHasBlockedTheOtherUser)
     return next(new ErrorHandler("You've blocked this user", 400));
@@ -96,6 +95,16 @@ exports.unfollowUser = catchAsyncErrors(async (req, res, next) => {
     user,
   });
 });
+
+exports.getAllFollowingAndFollwers = catchAsyncErrors(
+  async (req, res, next) => {
+    const user = await User.findById(req.user._id).populate(
+      "following followers","firstName lastName username email mobileNumber"
+    );
+
+    res.status(200).json({ success: true, user });
+  }
+);
 
 exports.blockUser = catchAsyncErrors(async (req, res, next) => {
   const { userId } = req.params;
@@ -234,3 +243,18 @@ exports.subscribeToUserOrUnsubscribe = catchAsyncErrors(
     }
   }
 );
+
+exports.getBlockedUsers = catchAsyncErrors(async (req, res, next) => {
+  const user = await User.findById(req.user._id).populate(
+    "blocked",
+    "firstName lastName username email mobileNumber"
+  );
+
+  if (!user.blocked.length) {
+    return res
+      .status(200)
+      .json({ success: true, message: "You don't have any blocked user" });
+  }
+
+  res.status(200).json({ success: true, user: user.blocked });
+});

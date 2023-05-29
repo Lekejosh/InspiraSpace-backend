@@ -33,3 +33,5 @@ const notificationSchema = require({
 }, {
   timestamps: true,
 });
+
+module.exports = mongoose.Model("Notification",notificationSchema)
