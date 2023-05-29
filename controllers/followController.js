@@ -110,7 +110,7 @@ exports.blockUser = catchAsyncErrors(async (req, res, next) => {
     return next(
       new ErrorHandler(
         "Amazing!!! So you want to block yourself from yourself😂😂😂",
-        400
+        403
       )
     );
 
@@ -162,3 +162,75 @@ exports.unBlockUser = catchAsyncErrors(async (req, res, next) => {
     .status(200)
     .json({ success: true, message: "User Unblocked successfully", user });
 });
+
+exports.subscribeToUserOrUnsubscribe = catchAsyncErrors(
+  async (req, res, next) => {
+    const { userId } = req.params;
+    const { subscribe } = req.query;
+
+    if (!userId || !subscribe) {
+      return next(new ErrorHandler("Required Parametrs not provided", 422));
+    }
+
+    if (userId == req.user._id) {
+      return next(
+        new ErrorHandler(
+          "Amazing!!! So you want to subscribe to yourself😂😂😂",
+          403
+        )
+      );
+    }
+    const userToSubscribeOrUnsubscribeTo = await User.findById(userId);
+
+    if (!userToSubscribeOrUnsubscribeTo) {
+      return next(new ErroHandler("User not found", 404));
+    }
+
+    const subscribingUser = await User.findById(req.user._id);
+
+    const alreadyBlocked = userToSubscribeOrUnsubscribeTo.blocked.includes(
+      req.user._id
+    );
+
+    if (alreadyBlocked) {
+      return next(new ErrorHandler("This artist has already blocked you", 403));
+    }
+
+    if (subscribe == "true") {
+      const alreadySubscribed =
+        userToSubscribeOrUnsubscribeTo.subscribers.includes(req.user._id);
+      if (alreadySubscribed) {
+        return next(
+          new ErrorHandler("you're already subscribe to this artist", 403)
+        );
+      }
+      userToSubscribeOrUnsubscribeTo.subscribers.push(req.user._id);
+      await userToSubscribeOrUnsubscribeTo.save();
+      res.status(200).json({
+        success: true,
+        message: "You successfully subscribe to the artist",
+      });
+    } else if (subscribe == "false") {
+      const notSubscribeToBefore =
+        userToSubscribeOrUnsubscribeTo.subscribers.includes(req.user._id);
+      if (!notSubscribeToBefore) {
+        return next(
+          new ErrorHandler(
+            "You're not subscribed to this artist before, so it's impossible to unsubscribe",
+            403
+          )
+        );
+      }
+
+      userToSubscribeOrUnsubscribeTo.subscribers =
+        userToSubscribeOrUnsubscribeTo.subscribers.filter(
+          (user) => user != req.user._id
+        );
+      await userToSubscribeOrUnsubscribeTo.save();
+      res.status(200).json({
+        success: true,
+        message: "You successfully unsubscribe to the artist",
+      });
+    }
+  }
+);

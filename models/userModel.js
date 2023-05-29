@@ -83,6 +83,7 @@ const userSchema = new mongoose.Schema(
     following: [{ type: String, ref: "User" }],
     followers: [{ type: String, ref: "User" }],
     blocked: [{ type: String, ref: "User" }],
+    subscribers: [{ type: String, ref: "User" }],
     generatedOtp: String,
     generatedOtpExpire: Date,
     resetPasswordToken: String,
