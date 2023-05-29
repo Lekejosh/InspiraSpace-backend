@@ -13,15 +13,10 @@ const userSchema = new mongoose.Schema(
         return require("uuid").v4();
       },
     },
-    firstName: {
+    displayName: {
       type: String,
-      required: [true, "Please Enter First Name"],
-      maxLength: [20, "First Name Cannot exceed 20 Characters"],
-    },
-    lastName: {
-      type: String,
-      required: [true, "Please Enter Last Name"],
-      maxLength: [20, "Last Name Cannot exceed 20 Characters"],
+      required: [true, "Please Enter a Display Name"],
+      maxLength: [30, "First Name Cannot exceed 30 Characters"],
     },
     email: {
       type: String,

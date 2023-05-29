@@ -6,11 +6,9 @@ const catchAsyncErrors = require("../middlewares/catchAsyncErrors");
 const sendToken = require("../utils/jwtToken");
 const { generateOTP } = require("../utils/otpGenerator");
 const cloudinary = require("cloudinary");
-const jwt = require("jsonwebtoken");
 
 exports.registerUser = catchAsyncErrors(async (req, res, next) => {
-  const { firstName, lastName, username, email, password, mobileNumber } =
-    req.body;
+  const { displayName, username, email, password, mobileNumber } = req.body;
 
   const checkExistingUser = async (key, value) => {
     const existingUser = await User.findOne({ [key]: value });
@@ -30,7 +28,7 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
   }
 
   const user = await User.create({
-    firstName,
+    displayName,
     lastName,
     email,
     username,
@@ -137,7 +135,11 @@ exports.loginUser = catchAsyncErrors(async (req, res, next) => {
     );
 
   const user = await User.findOne({
-    $or: [{ email: emailNumbName }, { mobileNumber: emailNumbName },{username:emailNumbName}],
+    $or: [
+      { email: emailNumbName },
+      { mobileNumber: emailNumbName },
+      { username: emailNumbName },
+    ],
   }).select("+password");
 
   if (!user) return next(new ErrorHandler("Invalid Credentials", 401));
@@ -385,4 +387,3 @@ exports.searchUser = catchAsyncErrors(async (req, res, next) => {
   // );
   res.status(200).json({ success: true, users });
 });
-

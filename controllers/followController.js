@@ -99,7 +99,8 @@ exports.unfollowUser = catchAsyncErrors(async (req, res, next) => {
 exports.getAllFollowingAndFollwers = catchAsyncErrors(
   async (req, res, next) => {
     const user = await User.findById(req.user._id).populate(
-      "following followers","firstName lastName username email mobileNumber"
+      "following followers",
+      "displayName username"
     );
 
     res.status(200).json({ success: true, user });
@@ -247,7 +248,7 @@ exports.subscribeToUserOrUnsubscribe = catchAsyncErrors(
 exports.getBlockedUsers = catchAsyncErrors(async (req, res, next) => {
   const user = await User.findById(req.user._id).populate(
     "blocked",
-    "firstName lastName username email mobileNumber"
+    "displayName username"
   );
 
   if (!user.blocked.length) {
