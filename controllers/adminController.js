@@ -48,6 +48,22 @@ exports.editUserRole = catchAsyncErrors(async (req, res, next) => {
     .status(200)
     .json({ success: true, message: "User Role updated successfully" });
 });
-// exports.deleteUser;
+exports.deleteUser = catchAsyncErrors(async (req, res, next) => {
+  const { userId } = req.params;
+
+  if (!userId) {
+    return next(new ErrorHandler("User Id not provided", 422));
+  }
+
+  const user = await User.findById(userId);
+
+  if (!user) {
+    return next(new ErrorHandler("User not found", 404));
+  }
+
+  user.deleteOne();
+
+  res.status(200).json({ success: true, message: "User Deleted successfully" });
+});
 // exports.deActivateUser;
 // exports.activateUser;
