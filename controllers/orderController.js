@@ -64,7 +64,9 @@ exports.getOrder = catchAsyncErrors(async (req, res, next) => {
 exports.getAllOrder = catchAsyncErrors(async (req, res, next) => {
   const order = await Order.find({ user: req.user._id });
 
-  if (!order.length) return next(new ErrorHandler("No Order not found", 404));
+  if (!order.length) {
+    return res.status(200).json({ success: true, message: "No Order found" });
+  }
 
   res.status(200).json({ success: true, order });
 });
@@ -81,9 +83,9 @@ exports.deleteOrder = catchAsyncErrors(async (req, res, next) => {
   if (order.user != req.user._id)
     return next(new ErrorHandler("You didn't create this order"));
 
-    if(Order.payment.status == 'paid') {
-      return next(new ErrorHandler("You can't delete an already paid order"))
-    }
+  if (Order.payment.status == "paid") {
+    return next(new ErrorHandler("You can't delete an already paid order"));
+  }
 
   Order.deleteOne();
 

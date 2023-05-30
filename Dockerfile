@@ -4,4 +4,5 @@ COPY package*.json ./
 RUN npm ci
 COPY . .
 EXPOSE 8080
-CMD ["npm", "run", "dev"]
+CMD ["pm2", "start", "server.js","-i","max"]
+# CMD [ "npm","run","dev" ]

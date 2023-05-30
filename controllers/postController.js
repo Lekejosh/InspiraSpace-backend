@@ -171,7 +171,7 @@ exports.deletePostReview = catchAsyncErrors(async (req, res, next) => {
   const post = await Post.findById(postId);
 
   if (!post) {
-    return next(new ErrorHandler("Post does not exist", 400));
+    return next(new ErrorHandler("Post does not exist", 404));
   }
 
   const reviewToDelete = post.reviews.find((rev) => rev._id === reviewId);
@@ -181,7 +181,7 @@ exports.deletePostReview = catchAsyncErrors(async (req, res, next) => {
   }
 
   if (reviewToDelete.user !== req.user._id) {
-    return next(new ErrorHandler("Not authorized to delete this review", 401));
+    return next(new ErrorHandler("Not authorized to delete this review", 403));
   }
 
   post.reviews = post.reviews.filter((rev) => rev._id !== reviewId);

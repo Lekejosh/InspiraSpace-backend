@@ -6,6 +6,7 @@ const {
   getAllUsers,
   editUserRole,
   deleteUser,
+  activateOrDeactivateUser,
 } = require("../controllers/adminController");
 
 const { isAuthenticatedUser, authorizeRole } = require("../middlewares/auth");
@@ -22,5 +23,8 @@ router
 router
   .route("/user/delete/:userId")
   .delete(isAuthenticatedUser, authorizeRole("admin"), deleteUser);
+router
+  .route("/user/deactivate/:userId")
+  .put(isAuthenticatedUser, authorizeRole("admin"), activateOrDeactivateUser);
 
 module.exports = router;

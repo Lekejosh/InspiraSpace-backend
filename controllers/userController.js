@@ -42,6 +42,8 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
     },
   });
 
+  //TODO: Remove the comment on Production
+
   // try {
   //   const data = `Your email Verification Token is :-\n\n ${user.generatedOtp} (This is only availbale for 15 Minutes!)\n\nif you have not requested this email  then, please Ignore it`;
   //   await sendEmail({
@@ -129,7 +131,7 @@ exports.loginUser = catchAsyncErrors(async (req, res, next) => {
   if (!emailNumbName || !password)
     return next(
       new ErrorHandler(
-        "Please enter your Email/Mobile Number and Password",
+        "Please enter your Email/Mobile Number/Username and Password",
         400
       )
     );
@@ -225,13 +227,19 @@ exports.updatePassword = catchAsyncErrors(async (req, res, next) => {
 });
 
 exports.forgotPassword = catchAsyncErrors(async (req, res, next) => {
-  const { emailNumb } = req.body;
+  const { emailNumbName } = req.body;
 
-  if (!emailNumb)
-    return next(new ErrorHandler("Please Provide Email/Mobile Number", 400));
+  if (!emailNumbName)
+    return next(
+      new ErrorHandler("Please Provide Email/Mobile Number/Username", 400)
+    );
 
   const user = await User.findOne({
-    $or: [{ email: emailNumb }, { mobileNumber: emailNumb }],
+    $or: [
+      { email: emailNumbName },
+      { mobileNumber: emailNumbName },
+      { username: emailNumbName },
+    ],
   });
 
   if (!user) {
@@ -368,7 +376,13 @@ exports.deactivateAccount = catchAsyncErrors(async (req, res, next) => {
 exports.activateAccount = catchAsyncErrors(async (req, res, next) => {
   const user = await User.findById(req.user._id);
 
+  if (user.isDeactivatedBy == "admin") {
+    return next(
+      new ErrorHandler("You can't activate you account, contact support")
+    );
+  }
   user.isDeactivated = false;
+  user.isDeactivatedBy = undefined;
   await user.save();
 
   res

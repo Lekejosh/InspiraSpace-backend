@@ -65,5 +65,35 @@ exports.deleteUser = catchAsyncErrors(async (req, res, next) => {
 
   res.status(200).json({ success: true, message: "User Deleted successfully" });
 });
-// exports.deActivateUser;
+exports.activateOrDeactivateUser = catchAsyncErrors(async (req, res, next) => {
+  const { userId } = req.params;
+  const { deactivate } = req.query;
+  if (!userId || !deactivate) {
+    return next(new ErrorHandler("Parameters not provided", 422));
+  }
+
+  const user = await User.findById(userId);
+
+  if (!user) {
+    return next(new ErrorHandler("User not found", 404));
+  }
+
+  if (deactivate == true) {
+    user.isDeactivated = deactivate;
+    user.isDeactivatedBy = "admin";
+    user.save();
+    return res
+      .status(200)
+      .json({ success: true, message: "User deactivated successfully" });
+  } else if (deactivate == false) {
+    user.isDeactivated = deactivate;
+    user.isDeactivatedBy = undefined;
+    user.save();
+    return res
+      .status(200)
+      .json({ success: true, message: "User has been activated successfully" });
+  }
+
+  return next(new ErrorHandler("Unexpected Parameter", 422));
+});
 // exports.activateUser;
