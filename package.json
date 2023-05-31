@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "nodemon server.js",
     "start": "node server.js",
-    "start:docker": "docker-compose up",
-    "start:pm2":"pm2 start server.js -i all"
+    "start:docker": "DOCKER=true docker-compose up",
+    "start:pm2": "pm2 start server.js -i max"
   },
   "keywords": [],
   "author": "",

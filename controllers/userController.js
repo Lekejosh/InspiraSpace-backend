@@ -7,7 +7,6 @@ const sendToken = require("../utils/jwtToken");
 const { generateOTP } = require("../utils/otpGenerator");
 const cloudinary = require("cloudinary");
 
-
 exports.registerUser = catchAsyncErrors(async (req, res, next) => {
   const { displayName, username, email, password, mobileNumber } = req.body;
 
@@ -30,7 +29,6 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
 
   const user = await User.create({
     displayName,
-    lastName,
     email,
     username,
     password,
@@ -45,21 +43,21 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
 
   //TODO: Remove the comment on Production
 
-  // try {
-  //   const data = `Your email Verification Token is :-\n\n ${user.generatedOtp} (This is only availbale for 15 Minutes!)\n\nif you have not requested this email  then, please Ignore it`;
-  //   await sendEmail({
-  //     email: `${user.firstName} <${user.email}>`,
-  //     subject: "Veritfy Account",
-  //     html: data,
-  //   }).then(() => {
-  //     console.log("Email Sent Successfully");
-  //   });
-  // } catch (err) {
-  //   user.generatedOtp = undefined;
-  //   user.generatedOtpExpire = undefined;
-  //   await user.save({ validateBeforeSave: false });
-  //   return next(new ErrorHandler(err.message, 500));
-  // }
+  try {
+    const data = `Your email Verification Token is :-\n\n ${user.generatedOtp} (This is only availbale for 15 Minutes!)\n\nif you have not requested this email  then, please Ignore it`;
+    await sendEmail({
+      email: `${user.username} <${user.email}>`,
+      subject: "Veritfy Account",
+      html: data,
+    }).then(() => {
+      console.log("Email Sent Successfully");
+    });
+  } catch (err) {
+    user.generatedOtp = undefined;
+    user.generatedOtpExpire = undefined;
+    await user.save({ validateBeforeSave: false });
+    return next(new ErrorHandler(err.message, 500));
+  }
 
   user.getAccessToken();
 
@@ -87,7 +85,7 @@ exports.verifyEmail = catchAsyncErrors(async (req, res, next) => {
   await user.save();
 
   await sendEmail({
-    email: `${user.firstName} <${user.email}>`,
+    email: `${user.username} <${user.email}>`,
     subject: "Account Verified",
     html: "Account Verified Successfully",
   });
@@ -402,4 +400,3 @@ exports.searchUser = catchAsyncErrors(async (req, res, next) => {
 
   res.status(200).json({ success: true, users });
 });
-

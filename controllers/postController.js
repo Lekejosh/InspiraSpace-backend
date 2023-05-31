@@ -4,7 +4,6 @@ const catchAsyncErrors = require("../middlewares/catchAsyncErrors");
 const cloudinary = require("cloudinary");
 const ErrorHandler = require("../utils/errorHandler");
 const Notification = require("../models/notificationModel");
-const { subscribeToUserOrUnsubscribe } = require("./followController");
 
 exports.createPost = catchAsyncErrors(async (req, res, next) => {
   const { body, images, isACollection, price } = req.body;

@@ -24,6 +24,14 @@ cloudinary.config({
 
 mongoose.set("strictQuery", true);
 
+// Check if running in Docker container
+const isDocker = process.env.DOCKER === "true";
+
+// MongoDB connection URL
+const mongoURL = isDocker
+  ? `${process.env.DB_URI}/${process.env.DB_NAME}`
+  : `${process.env.DB_URI_1}/${process.env.DB_NAME}`;
+
 // console.log("Server is runningggg");
 // if (cluster.isMaster) {
 //   const NUM_WORKERS = os.cpus().length;
@@ -34,7 +42,7 @@ mongoose.set("strictQuery", true);
 // }
 
 mongoose
-  .connect(`${process.env.DB_URI}/${process.env.DB_NAME}`)
+  .connect(mongoURL)
   .then(() =>
     app.listen(process.env.PORT, () => {
       console.log(`Server is working on http://localhost:${process.env.PORT}`);

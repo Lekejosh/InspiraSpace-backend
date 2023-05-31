@@ -4,7 +4,7 @@ services:
     container_name: inspiraspace
     image: mongo:latest
     restart: always
-    ports: 
+    ports:
       - 2717:27017
     volumes:
       - mongo_db:/data/db
@@ -17,7 +17,7 @@ services:
     volumes:
       - .:/usr/src/app
     ports:
-      - "${PORT}:${PORT_1}"
+      - "${PORT}-${PORT_2}:${PORT_1}"
     environment:
       ACCESS_TOKEN_EXPIRE: "${ACCESS_TOKEN_EXPIRE}"
       ACCESS_TOKEN_SECRET: "${ACCESS_TOKEN_SECRET}"
@@ -35,6 +35,7 @@ services:
       CLOUDINARY_NAME: "${CLOUDINARY_NAME}"
       CLOUDINARY_APIKEY: "${CLOUDINARY_APIKEY}"
       CLOUDINARY_SECRET: "${CLOUDINARY_SECRET}"
+      DOCKER: true
     depends_on:
       - mongo_db
 
