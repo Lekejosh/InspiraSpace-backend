@@ -391,13 +391,14 @@ exports.activateAccount = catchAsyncErrors(async (req, res, next) => {
 });
 
 exports.searchUser = catchAsyncErrors(async (req, res, next) => {
-  //TODO: Fix this
-  const users = await User.find().find({ _id: { $ne: req.user._id } });
-  // const mainUser = await User.findById(req.user._id);
-  // const filtered = mainUser.blocked.filter(
-  //   blocked.forEach((user) => {
-  //     user != users._id;
-  //   })
-  // );
+  const mainUser = await User.findById(req.user._id);
+  const blockedIds = mainUser.blocked.map((user) => user.toString());
+
+  const users = await User.find({
+    _id: { $nin: blockedIds, $ne: req.user._id },
+    blocked: { $ne: req.user._id },
+  });
+
   res.status(200).json({ success: true, users });
 });
+

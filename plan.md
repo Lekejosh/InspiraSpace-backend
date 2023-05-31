@@ -37,3 +37,4 @@
 - On Mentions
 - On Trending Art(If A user Art is part of the top 50 trending)
 - To every user subscribe to an artist watchers list
+- Add Redis cache

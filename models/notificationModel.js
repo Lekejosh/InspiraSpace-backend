@@ -28,7 +28,7 @@ const notificationSchema = require({
   },
   user: {
     type: String,
-    ref: "user",
+    ref: "User",
   },
 }, {
   timestamps: true,
