@@ -2,6 +2,8 @@ const Post = require("../models/postModel");
 const catchAsyncErrors = require("../middlewares/catchAsyncErrors");
 const cloudinary = require("cloudinary");
 const ErrorHandler = require("../utils/errorHandler");
+const Notification = require("../models/notificationModel");
+const { subscribeToUserOrUnsubscribe } = require("./followController");
 
 exports.createPost = catchAsyncErrors(async (req, res, next) => {
   const { body, images, isACollection, price } = req.body;
@@ -15,6 +17,20 @@ exports.createPost = catchAsyncErrors(async (req, res, next) => {
     price,
     author: req.user._id,
   });
+
+  const author = await User.findById(req.user._id);
+
+  if (author.subscribers.length > 0) {
+    for (let i = 0; i < author.subscribers.length; i++) {
+      await Notification.create({
+        type: "art",
+        typeId: post._id,
+        content: `${req.user.username} just made a post`,
+        userId: author.subscribers[i],
+      });
+    }
+  }
+
   await post.populate("author", "firstName lastName");
   res.status(201).json({ success: true, message: "Post created", post });
 });
@@ -77,9 +93,18 @@ exports.likePost = catchAsyncErrors(async (req, res, next) => {
   post.likes.push(req.user._id);
   await post.save();
 
-  res
-    .status(200)
-    .json({ success: true, message: "Post liked successfully", post });
+  const notification = await Notification.create({
+    type: "like",
+    typeId: postId,
+    content: `${req.user.username} just liked your post`,
+    userId: post.author,
+  });
+  res.status(200).json({
+    success: true,
+    message: "Post liked successfully",
+    post,
+    notification,
+  });
 });
 
 exports.unlikePost = catchAsyncErrors(async (req, res, next) => {
@@ -144,6 +169,13 @@ exports.createPostReview = catchAsyncErrors(async (req, res, next) => {
   post.ratings = avg / post.reviews.length;
 
   await post.save({ validateBeforeSave: false });
+
+  await Notification.create({
+    type: "comment",
+    typeId: postId,
+    content: `${req.user.username} just made a comment on your post`,
+    userId: post.author,
+  });
 
   res.status(201).json({
     success: true,

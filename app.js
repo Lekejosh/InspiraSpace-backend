@@ -51,11 +51,14 @@ const post = require("./routes/postRoute");
 const follow = require("./routes/followRoute");
 const order = require("./routes/orderRouter");
 const admin = require("./routes/adminRoute");
+const notification = require("./routes/notificationRoute");
+
 app.use("/api/v1/user", user);
 app.use("/api/v1/post", post);
 app.use("/api/v1/follow", follow);
 app.use("/api/v1/order", order);
 app.use("/api/v1/admin", admin);
+app.use("/api/v1/notification", notification);
 
 app.use(errorMiddleware);
 

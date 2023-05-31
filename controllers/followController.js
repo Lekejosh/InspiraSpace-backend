@@ -1,6 +1,7 @@
 const User = require("../models/userModel");
 const ErrorHandler = require("../utils/errorHandler");
 const catchAsyncErrors = require("../middlewares/catchAsyncErrors");
+const Notification = require("../models/notificationModel");
 
 exports.followUser = catchAsyncErrors(async (req, res, next) => {
   const { userId } = req.params;
@@ -44,6 +45,13 @@ exports.followUser = catchAsyncErrors(async (req, res, next) => {
   userToFollow.followers.push(req.user._id);
   await userToFollow.save();
 
+  const notification = await Notification.create({
+    type: "follow",
+    typeId: req.user._id,
+    content: `${user.username} just followed you`,
+    userId: userId,
+  });
+
   user.following.push(userId);
   await user.save();
 
@@ -51,6 +59,7 @@ exports.followUser = catchAsyncErrors(async (req, res, next) => {
     success: true,
     message: "User followed successfully",
     user,
+    notification,
   });
 });
 

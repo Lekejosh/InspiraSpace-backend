@@ -7,6 +7,7 @@ const sendToken = require("../utils/jwtToken");
 const { generateOTP } = require("../utils/otpGenerator");
 const cloudinary = require("cloudinary");
 
+
 exports.registerUser = catchAsyncErrors(async (req, res, next) => {
   const { displayName, username, email, password, mobileNumber } = req.body;
 

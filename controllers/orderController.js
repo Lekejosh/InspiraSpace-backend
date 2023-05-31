@@ -3,7 +3,7 @@ const Order = require("../models/orderModel");
 const Post = require("../models/postModel");
 const catchAsyncErrors = require("../middlewares/catchAsyncErrors");
 const ErrorHandler = require("../utils/errorHandler");
-const { OrderedBulkOperation } = require("mongodb");
+const Notification = require("../models/notificationModel");
 
 exports.createOrder = catchAsyncErrors(async (req, res, next) => {
   const { location, items, price, tax, totalAmount } = req.body;
@@ -41,6 +41,15 @@ exports.payForOrder = catchAsyncErrors(async (req, res, next) => {
 
   order.payment = payment;
   await order.save();
+
+  for (let i = 0; i < order.items; i++) {
+    await Notification.create({
+      type: "art",
+      typeId: order._id,
+      content: `${req.user.username} just made an Order`,
+      userId: order.items[i].artist,
+    });
+  }
 
   res
     .status(200)
