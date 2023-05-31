@@ -1,4 +1,5 @@
 const Post = require("../models/postModel");
+const User = require("../models/userModel");
 const catchAsyncErrors = require("../middlewares/catchAsyncErrors");
 const cloudinary = require("cloudinary");
 const ErrorHandler = require("../utils/errorHandler");

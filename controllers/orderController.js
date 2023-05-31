@@ -42,9 +42,9 @@ exports.payForOrder = catchAsyncErrors(async (req, res, next) => {
   order.payment = payment;
   await order.save();
 
-  for (let i = 0; i < order.items; i++) {
+  for (let i = 0; i < order.items.length; i++) {
     await Notification.create({
-      type: "art",
+      type: "order",
       typeId: order._id,
       content: `${req.user.username} just made an Order`,
       userId: order.items[i].artist,
