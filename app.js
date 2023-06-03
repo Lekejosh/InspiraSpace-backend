@@ -52,6 +52,7 @@ const follow = require("./routes/followRoute");
 const order = require("./routes/orderRouter");
 const admin = require("./routes/adminRoute");
 const notification = require("./routes/notificationRoute");
+const art = require("./routes/artRoutes");
 
 app.use("/api/v1/user", user);
 app.use("/api/v1/post", post);
@@ -59,6 +60,7 @@ app.use("/api/v1/follow", follow);
 app.use("/api/v1/order", order);
 app.use("/api/v1/admin", admin);
 app.use("/api/v1/notification", notification);
+app.use("/api/v1/art", art);
 
 app.use(errorMiddleware);
 

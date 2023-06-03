@@ -6,15 +6,24 @@ const ErrorHandler = require("../utils/errorHandler");
 const Notification = require("../models/notificationModel");
 
 exports.createPost = catchAsyncErrors(async (req, res, next) => {
-  const { body, images, isACollection, price } = req.body;
+  const { body, isACollection, price, type } = req.body;
+  const images = [];
 
-  if (!body && !images)
-    return next(new ErrorHandler("The two Input fields can't be empty", 422));
+  if (!body && !req.files.length) {
+    return next(new ErrorHandler("The input fields can't be empty", 422));
+  }
+
+  for (const file of req.files) {
+    const result = await cloudinary.uploader.upload(file.path);
+    images.push(result.secure_url);
+  }
 
   const post = await Post.create({
     body,
+    images,
     isACollection,
     price,
+    type,
     author: req.user._id,
   });
 
@@ -31,7 +40,7 @@ exports.createPost = catchAsyncErrors(async (req, res, next) => {
     }
   }
 
-  await post.populate("author", "firstName lastName");
+  await post.populate("author", "firstName lastName").execPopulate();
   res.status(201).json({ success: true, message: "Post created", post });
 });
 

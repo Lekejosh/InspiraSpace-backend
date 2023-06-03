@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 
+
+const upload = require("../utils/multer");
 const {
   createPost,
   editPost,
@@ -14,7 +16,7 @@ const {
 
 const { isAuthenticatedUser } = require("../middlewares/auth");
 
-router.route("/").post(isAuthenticatedUser, createPost);
+router.route("/").post(upload.single("avatar"),isAuthenticatedUser, createPost);
 router
   .route("/edit/:postId")
   .put(isAuthenticatedUser, editPost)

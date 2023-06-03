@@ -16,6 +16,7 @@ const {
   deactivateAccount,
   activateAccount,
   searchUser,
+  updateIntrests,
 } = require("../controllers/userController");
 const { isAuthenticatedUser, deactivated } = require("../middlewares/auth");
 
@@ -37,6 +38,9 @@ router
   .route("/update/avatar")
   .put(upload.single("avatar"), isAuthenticatedUser, deactivated, updateAvatar)
   .delete(isAuthenticatedUser, deactivated, removeAvatar);
+router
+  .route("/update/intrest")
+  .put(isAuthenticatedUser, deactivated, updateIntrests);
 router.route("/logout").post(isAuthenticatedUser, deactivated, logoutUser);
 router
   .route("/account/deactivate")

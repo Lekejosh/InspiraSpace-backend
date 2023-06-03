@@ -78,6 +78,23 @@ const userSchema = new mongoose.Schema(
       enum: ["user", "admin"],
       default: "user",
     },
+    intrests: [
+      {
+        type: String,
+        enum: [
+          "abstract",
+          "modern",
+          "impressionist",
+          "pop",
+          "cubism",
+          "surrealism",
+          "contemporary",
+          "Contemporary",
+          "fantasy",
+          "graffiti",
+        ],
+      },
+    ],
     following: [{ type: String, ref: "User" }],
     followers: [{ type: String, ref: "User" }],
     blocked: [{ type: String, ref: "User" }],

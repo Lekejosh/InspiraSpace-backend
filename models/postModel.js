@@ -14,12 +14,7 @@ const postSchema = new mongoose.Schema(
     },
     images: [
       {
-        public_id: {
-          type: String,
-        },
-        url: {
-          type: String,
-        },
+        type: String,
       },
     ],
     isACollection: {
@@ -29,6 +24,23 @@ const postSchema = new mongoose.Schema(
     price: {
       type: Number,
     },
+    type: [
+      {
+        type: String,
+        enum: [
+          "abstract",
+          "modern",
+          "impressionist",
+          "pop",
+          "cubism",
+          "surrealism",
+          "contemporary",
+          "Contemporary",
+          "fantasy",
+          "graffiti",
+        ],
+      },
+    ],
     ratings: {
       type: Number,
       default: 0,

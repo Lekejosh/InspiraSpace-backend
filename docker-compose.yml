@@ -17,7 +17,7 @@ services:
     volumes:
       - .:/usr/src/app
     ports:
-      - "${PORT}-${PORT_2}:${PORT_1}"
+      - "${PORT}:${PORT_1}"
     environment:
       ACCESS_TOKEN_EXPIRE: "${ACCESS_TOKEN_EXPIRE}"
       ACCESS_TOKEN_SECRET: "${ACCESS_TOKEN_SECRET}"
