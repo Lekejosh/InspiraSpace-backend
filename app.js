@@ -12,12 +12,22 @@ const bodyParser = require("body-parser");
 const errorMiddleware = require("./middlewares/error");
 const helmet = require("helmet");
 const passport = require("passport");
+const rateLimit = require("express-rate-limit");
 
 app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+const limiter = rateLimit({
+  windowMs: 15 * 1000,
+  max: 2,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+app.use(limiter);
 
 app.use(
   session({

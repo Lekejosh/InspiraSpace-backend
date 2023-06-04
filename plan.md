@@ -8,7 +8,8 @@
 - Email Verification ✅
 - Account Update ✅
 - Bio ✅
-- Cover Image + Avatar 
+- Cover Image + Avatar
+- Twitter Login auth
 
 ## Art
 
@@ -39,7 +40,7 @@
 
 - On Post Like ✅
 - On Comments ✅
-- On Mentions 
+- On Mentions
 - On Trending Art(If A user Art is part of the top 50 trending)
 - To every user subscribe to an artist watchers list ✅
 - Add Redis cache

@@ -9,12 +9,14 @@ exports.createPost = catchAsyncErrors(async (req, res, next) => {
   const { body, isACollection, price, type } = req.body;
   const images = [];
 
-  if (!body && !req.files.length) {
-    return next(new ErrorHandler("The input fields can't be empty", 422));
+  if (!req.files.length) {
+    return next(new ErrorHandler("Image fields can't be empty", 422));
   }
 
   for (const file of req.files) {
-    const result = await cloudinary.uploader.upload(file.path);
+    const result = await cloudinary.uploader.upload(file.path, {
+      folder: "InspiraSpace_Art",
+    });
     images.push(result.secure_url);
   }
 
@@ -40,7 +42,7 @@ exports.createPost = catchAsyncErrors(async (req, res, next) => {
     }
   }
 
-  await post.populate("author", "firstName lastName").execPopulate();
+  await post.populate("author", "firstName lastName");
   res.status(201).json({ success: true, message: "Post created", post });
 });
 

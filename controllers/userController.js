@@ -241,6 +241,10 @@ exports.updateIntrests = catchAsyncErrors(async (req, res, next) => {
 exports.changeUsername = catchAsyncErrors(async (req, res, next) => {
   const { username } = req.body;
 
+  if (!username) {
+    return next(new ErrorHandler("Username not provided", 422));
+  }
+
   const existingUserName = await User.findOne({ username: username });
 
   if (existingUserName) {
