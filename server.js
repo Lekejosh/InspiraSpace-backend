@@ -9,6 +9,7 @@ const cloudinary = require("cloudinary");
 const cluster = require("cluster");
 const os = require("os");
 require("dotenv").config();
+require("./utils/auth");
 
 process.on("uncaughtException", (err) => {
   console.log(`Error: $err: ${err.message}`);

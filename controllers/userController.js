@@ -7,6 +7,8 @@ const sendToken = require("../utils/jwtToken");
 const { generateOTP } = require("../utils/otpGenerator");
 const cloudinary = require("cloudinary");
 
+const passport = require("passport");
+
 exports.registerUser = catchAsyncErrors(async (req, res, next) => {
   const { displayName, username, email, password, mobileNumber, intrests } =
     req.body;
@@ -65,6 +67,44 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
 
   sendToken(user, 201, res);
 });
+
+exports.googleAuth = passport.authenticate("google", {
+  scope: ["email", "profile"],
+});
+
+exports.googleAuthSession = (req, res, next) => {
+  passport.authenticate("google", async (err, user) => {
+    if (err) {
+      return next(err);
+    }
+
+    if (!user) {
+      return res.redirect("/");
+    }
+
+    try {
+      const googleUser = await User.findOne({ email: user.email });
+
+      if (googleUser) {
+        googleUser.getAccessToken();
+        sendToken(googleUser, 200, res);
+      } else {
+        const newUser = await User.create({
+          email: user.email,
+          displayName: user.displayName,
+          username: user.given_name + user.id,
+          isVerified: true,
+          password: user.id,
+        });
+
+        newUser.getAccessToken();
+        sendToken(newUser, 201, res);
+      }
+    } catch (error) {
+      return next(error);
+    }
+  })(req, res, next);
+};
 
 exports.verifyEmail = catchAsyncErrors(async (req, res, next) => {
   const { otp } = req.body;

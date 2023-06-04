@@ -17,12 +17,17 @@ const {
   activateAccount,
   searchUser,
   updateIntrests,
+  googleAuth,
+  googleAuthSession,
+  googleAuthenticatedUser,
 } = require("../controllers/userController");
 const { isAuthenticatedUser, deactivated } = require("../middlewares/auth");
 
 const upload = require("../utils/multer");
 
 router.route("/register").post(registerUser);
+router.route("/auth/google").get(googleAuth);
+router.route("/sessions/google").get(googleAuthSession);
 router.route("/login").post(loginUser);
 router
   .route("/me")

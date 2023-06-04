@@ -11,6 +11,7 @@ const session = require("express-session");
 const bodyParser = require("body-parser");
 const errorMiddleware = require("./middlewares/error");
 const helmet = require("helmet");
+const passport = require("passport");
 
 app.use(helmet());
 app.use(express.json());
@@ -34,6 +35,9 @@ app.use(
     },
   })
 );
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.get("/", (req, res) => {
   res.status(200).json({
