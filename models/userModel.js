@@ -89,7 +89,6 @@ const userSchema = new mongoose.Schema(
           "cubism",
           "surrealism",
           "contemporary",
-          "Contemporary",
           "fantasy",
           "graffiti",
         ],

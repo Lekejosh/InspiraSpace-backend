@@ -19,7 +19,7 @@ const {
   updateIntrests,
   googleAuth,
   googleAuthSession,
-  googleAuthenticatedUser,
+  changeUsername,
 } = require("../controllers/userController");
 const { isAuthenticatedUser, deactivated } = require("../middlewares/auth");
 
@@ -46,6 +46,9 @@ router
 router
   .route("/update/intrest")
   .put(isAuthenticatedUser, deactivated, updateIntrests);
+router
+  .route("/update/username")
+  .put(isAuthenticatedUser, deactivated, changeUsername);
 router.route("/logout").post(isAuthenticatedUser, deactivated, logoutUser);
 router
   .route("/account/deactivate")

@@ -79,7 +79,7 @@ exports.googleAuthSession = (req, res, next) => {
     }
 
     if (!user) {
-      return res.redirect("/");
+      return res.redirect("/api/v1/user/login");
     }
 
     try {
@@ -236,6 +236,25 @@ exports.updateIntrests = catchAsyncErrors(async (req, res, next) => {
   user.save();
 
   res.status(200).json({ success: true, message: "User Intrest updated" });
+});
+
+exports.changeUsername = catchAsyncErrors(async (req, res, next) => {
+  const { username } = req.body;
+
+  const existingUserName = await User.findOne({ username: username });
+
+  if (existingUserName) {
+    return next(new ErrorHandler("Username already exist", 401));
+  }
+
+  const user = await User.findById(req.user._id);
+
+  user.username = username;
+
+  await user.save();
+  res
+    .status(200)
+    .json({ success: true, message: "Username changed Successfully" });
 });
 
 exports.updateProfile = catchAsyncErrors(async (req, res, next) => {
