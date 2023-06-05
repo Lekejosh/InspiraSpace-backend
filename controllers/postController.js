@@ -1,5 +1,6 @@
 const Post = require("../models/postModel");
 const User = require("../models/userModel");
+const Order = require("../models/postModel");
 const catchAsyncErrors = require("../middlewares/catchAsyncErrors");
 const cloudinary = require("cloudinary");
 const ErrorHandler = require("../utils/errorHandler");
@@ -85,6 +86,20 @@ exports.deletePost = catchAsyncErrors(async (req, res, next) => {
     );
 
   post.deleteOne();
+
+const order = await Order.find({ "items.itemId": postId });
+
+for (const orderItem of order) {
+  if (orderItem.payment.status === "paid" && !orderItem.isDelivered) {
+    await Notification.create({
+      type: "art",
+      typeId: postId,
+      content: `${req.user.username} just deleted a post you've ordered for`,
+      userId: orderItem.user,
+    });
+  }
+}
+
 
   res.status(200).json({
     success: true,
