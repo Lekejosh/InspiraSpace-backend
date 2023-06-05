@@ -18,7 +18,10 @@ exports.getUser = catchAsyncErrors(async (req, res, next) => {
   if (!user) {
     return next(new ErrorHandler("User not found", 404));
   }
-  res.status(200).json({ success: true, user });
+
+  const post = await Post.find({ author: userId }).sort("-createdAt");
+
+  res.status(200).json({ success: true, user, post });
 });
 
 exports.getAllUsers = catchAsyncErrors(async (req, res, next) => {

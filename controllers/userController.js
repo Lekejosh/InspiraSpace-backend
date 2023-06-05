@@ -1,4 +1,5 @@
 const User = require("../models/userModel");
+const Post = require("../models/postModel");
 const crypto = require("crypto");
 const ErrorHandler = require("../utils/errorHandler");
 const sendEmail = require("../utils/sendMail");
@@ -196,12 +197,14 @@ exports.loginUser = catchAsyncErrors(async (req, res, next) => {
   sendToken(user, 200, res);
 });
 
-exports.getUser = catchAsyncErrors(async (req, res, next) => {
+exports.getMe = catchAsyncErrors(async (req, res, next) => {
   const user = await User.findById(req.user._id);
 
   if (!user) return next(new ErrorHandler("User not found", 404));
 
-  res.status(200).json({ user });
+  const post = await Post.find({ author: req.user._id }).sort("-createdAt");
+
+  res.status(200).json({ success: true, user, post });
 });
 
 exports.logoutUser = catchAsyncErrors(async (req, res, next) => {
@@ -471,6 +474,24 @@ exports.activateAccount = catchAsyncErrors(async (req, res, next) => {
   res
     .status(200)
     .json({ success: true, message: "Account is activated successfully" });
+});
+
+exports.getUser = catchAsyncErrors(async (req, res, next) => {
+  const { userId } = req.query;
+  if (!userId) {
+    return next(new ErrorHandler("User Id is not provided", 422));
+  }
+  const user = await User.findById(userId).populate(
+    "following followers blocked subscribers",
+    "displayName username"
+  );
+  if (!user) {
+    return next(new ErrorHandler("User not found", 404));
+  }
+
+  const post = await Post.find({ author: userId }).sort("-createdAt");
+
+  res.status(200).json({ success: true, user, post });
 });
 
 exports.searchUser = catchAsyncErrors(async (req, res, next) => {

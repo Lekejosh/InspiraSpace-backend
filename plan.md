@@ -28,7 +28,7 @@
 - Order Art ✅
 - Follow Artist ✅
 - Get Notification from followed Artist who just posted in a while
-- User Feed Populated by followed Artist Post activites
+- User Feed Populated by followed Artist Post activites ✅
 - Get & Post Comment on Artworks ✅
 
 ### Other Need Features

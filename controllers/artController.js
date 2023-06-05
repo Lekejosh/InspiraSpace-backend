@@ -85,3 +85,24 @@ exports.artBasedOnUserIntrest = catchAsyncErrors(async (req, res, next) => {
     data: arts,
   });
 });
+
+exports.userArtFeed = catchAsyncErrors(async (req, res, next) => {
+  const user = await User.findById(req.user._id);
+
+  const followingIds = user.following;
+
+  const fourDaysAgo = new Date();
+  fourDaysAgo.setDate(fourDaysAgo.getDate() - 4);
+
+  const posts = await Post.find({
+    author: { $in: followingIds },
+    createdAt: { $gte: fourDaysAgo },
+    likes: { $ne: req.user._id },
+    comments: { $not: { $elemMatch: { user: req.user._id } } },
+  }).sort("-createdAt");
+
+  res.status(200).json({
+    success: true,
+    data: posts,
+  });
+});

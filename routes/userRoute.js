@@ -4,7 +4,6 @@ const router = express.Router();
 const {
   registerUser,
   loginUser,
-  getUser,
   verifyEmail,
   resendOtp,
   logoutUser,
@@ -20,6 +19,8 @@ const {
   googleAuth,
   googleAuthSession,
   changeUsername,
+  getMe,
+  getUser,
 } = require("../controllers/userController");
 const { isAuthenticatedUser, deactivated } = require("../middlewares/auth");
 
@@ -31,7 +32,7 @@ router.route("/sessions/google").get(googleAuthSession);
 router.route("/login").post(loginUser);
 router
   .route("/me")
-  .get(isAuthenticatedUser, deactivated, getUser)
+  .get(isAuthenticatedUser, deactivated, getMe)
   .put(isAuthenticatedUser, deactivated, updateProfile);
 router
   .route("/email/verify")
@@ -55,4 +56,5 @@ router
   .get(isAuthenticatedUser, deactivated, deactivateAccount);
 router.route("/account/activate").get(isAuthenticatedUser, activateAccount);
 router.route("/search").get(isAuthenticatedUser, searchUser);
+router.route('/get/user').get(isAuthenticatedUser,getUser)
 module.exports = router;
