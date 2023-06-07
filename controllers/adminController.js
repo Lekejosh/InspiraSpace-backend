@@ -21,7 +21,9 @@ exports.getUser = catchAsyncErrors(async (req, res, next) => {
 
   const post = await Post.find({ author: userId }).sort("-createdAt");
 
-  res.status(200).json({ success: true, user, post });
+  const postToSend = { user, post };
+
+  res.status(200).json({ success: true, data: [postToSend] });
 });
 
 exports.getAllUsers = catchAsyncErrors(async (req, res, next) => {

@@ -477,11 +477,13 @@ exports.activateAccount = catchAsyncErrors(async (req, res, next) => {
 });
 
 exports.getUser = catchAsyncErrors(async (req, res, next) => {
-  const { userId } = req.query;
-  if (!userId) {
-    return next(new ErrorHandler("User Id is not provided", 422));
+  const { userIdOrUsername } = req.params;
+  if (!userIdOrUsername) {
+    return next(new ErrorHandler("User Id or Username is not provided", 422));
   }
-  const user = await User.findById(userId).populate(
+  const user = await User.findOne({
+    $or: [{ _id: userIdOrUsername }, { username: userIdOrUsername }],
+  }).populate(
     "following followers blocked subscribers",
     "displayName username"
   );
@@ -489,9 +491,10 @@ exports.getUser = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("User not found", 404));
   }
 
-  const post = await Post.find({ author: userId }).sort("-createdAt");
+  const post = await Post.find({ author: user._id }).sort("-createdAt");
+  const postToSend = { user, post };
 
-  res.status(200).json({ success: true, user, post });
+  res.status(200).json({ success: true, data: [postToSend] });
 });
 
 exports.searchUser = catchAsyncErrors(async (req, res, next) => {

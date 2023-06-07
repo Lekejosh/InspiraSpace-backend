@@ -56,5 +56,5 @@ router
   .get(isAuthenticatedUser, deactivated, deactivateAccount);
 router.route("/account/activate").get(isAuthenticatedUser, activateAccount);
 router.route("/search").get(isAuthenticatedUser, searchUser);
-router.route('/get/user').get(isAuthenticatedUser,getUser)
+router.route("/get/user/:userIdOrUsername").get(isAuthenticatedUser, getUser);
 module.exports = router;
