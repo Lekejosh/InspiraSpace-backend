@@ -9,15 +9,19 @@ const postSchema = new mongoose.Schema(
         return require("uuid").v4();
       },
     },
-    body: {
+    title: {
       type: String,
+    },
+    description: {
+      type: String,
+      maxLength: [300, "Description can't be more than 300 Characters"],
     },
     images: [
       {
         type: String,
       },
     ],
-    isACollection: {
+    monetize: {
       type: Boolean,
       deafult: false,
     },

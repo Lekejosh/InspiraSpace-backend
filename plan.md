@@ -45,3 +45,5 @@
 - To every user subscribe to an artist watchers list ✅
 - Add Redis cache
 - Create Draft Controller
+- Wallet
+- Add Socket io for messages

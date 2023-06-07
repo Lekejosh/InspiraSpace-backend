@@ -7,11 +7,11 @@ const ErrorHandler = require("../utils/errorHandler");
 const Notification = require("../models/notificationModel");
 
 exports.createPost = catchAsyncErrors(async (req, res, next) => {
-  const { body, isACollection, price, type } = req.body;
+  const { title, description, monetize, price, type } = req.body;
   const images = [];
 
-  if (!req.files.length) {
-    return next(new ErrorHandler("Image fields can't be empty", 422));
+  if (!title || !req.files.length) {
+    return next(new ErrorHandler("Image or Title fields can't be empty", 422));
   }
 
   for (const file of req.files) {
@@ -22,9 +22,10 @@ exports.createPost = catchAsyncErrors(async (req, res, next) => {
   }
 
   const post = await Post.create({
-    body,
     images,
-    isACollection,
+    title,
+    description,
+    monetize,
     price,
     type,
     author: req.user._id,
@@ -48,7 +49,7 @@ exports.createPost = catchAsyncErrors(async (req, res, next) => {
 });
 
 exports.editPost = catchAsyncErrors(async (req, res, next) => {
-  const { body } = req.body;
+  const { title, description } = req.body;
   const { postId } = req.params;
 
   if (!postId) return next(new ErrorHandler("Post Id not specified", 422));
@@ -61,8 +62,12 @@ exports.editPost = catchAsyncErrors(async (req, res, next) => {
     return next(
       new ErrorHandler("Unauthorized to edit someone else's Post", 401)
     );
-
-  post.body = body;
+  if (title) {
+    post.title = title;
+  }
+  if (description) {
+    post.description = description;
+  }
   post.isEdited = true;
   await post.save();
 
@@ -87,19 +92,18 @@ exports.deletePost = catchAsyncErrors(async (req, res, next) => {
 
   post.deleteOne();
 
-const order = await Order.find({ "items.itemId": postId });
+  const order = await Order.find({ "items.itemId": postId });
 
-for (const orderItem of order) {
-  if (orderItem.payment.status === "paid" && !orderItem.isDelivered) {
-    await Notification.create({
-      type: "art",
-      typeId: postId,
-      content: `${req.user.username} just deleted a post you've ordered for`,
-      userId: orderItem.user,
-    });
+  for (const orderItem of order) {
+    if (orderItem.payment.status === "paid" && !orderItem.isDelivered) {
+      await Notification.create({
+        type: "art",
+        typeId: postId,
+        content: `${req.user.username} just deleted a post you've ordered for`,
+        userId: orderItem.user,
+      });
+    }
   }
-}
-
 
   res.status(200).json({
     success: true,

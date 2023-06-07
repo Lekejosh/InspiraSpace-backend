@@ -58,7 +58,7 @@ exports.allMessages = catchAsyncErrors(async (req, res, next) => {
 });
 
 exports.isReadMessage = catchAsyncErrors(async (req, res, next) => {
-  const { messageId } = req.params;
+  const { messageId } = req.query;
 
   if (!messageId) return next(new ErrorHandler("Message Id not provided", 401));
 
@@ -66,12 +66,12 @@ exports.isReadMessage = catchAsyncErrors(async (req, res, next) => {
 
   if (!message) return next(new ErrorHandler("Message not found", 404));
 
-  const ifExist = message.isReadBy.find(
-    (user) => user._id.toString() === req.user._id.toString()
+  const ifExist = message.isReadBy.includes(
+   req.user._id
   );
 
   if (ifExist) {
-    return next(new ErrorHandler("User already Read this message", 400));
+    return next(new ErrorHandler("You've already Read this message", 400));
   }
 
   message.isReadBy.push(req.user._id);
