@@ -42,6 +42,8 @@ const postSchema = new mongoose.Schema(
           "Contemporary",
           "fantasy",
           "graffiti",
+          "UI/UX",
+          "NFT",
         ],
       },
     ],
@@ -70,7 +72,7 @@ const postSchema = new mongoose.Schema(
           type: String,
           ref: "User",
           required: true,
-        },
+        }, 
         rating: {
           type: Number,
           required: true,

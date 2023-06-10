@@ -5,28 +5,31 @@ services:
     image: mongo:latest
     restart: always
     ports:
-      - 2717:27017
+      - "2717:27017"
     volumes:
       - mongo_db:/data/db
+    networks:
+      - inspiraspace-server
 
-  # Node Api service
   api:
     build: .
     image: lekejosh/inspiraspace
     restart: always
+    hostname: inspiraspaceServer
     volumes:
       - .:/usr/src/app
     ports:
-      - "${PORT}:${PORT_1}"
+      - "${PORT}:${PORT}"
+    networks:
+      - inspiraspace-server
     environment:
       ACCESS_TOKEN_EXPIRE: "${ACCESS_TOKEN_EXPIRE}"
       ACCESS_TOKEN_SECRET: "${ACCESS_TOKEN_SECRET}"
       REFRESH_TOKEN_EXPIRE: "${REFRESH_TOKEN_EXPIRE}"
       REFRESH_TOKEN_SECRET: "${REFRESH_TOKEN_SECRET}"
-      PORT: "${PORT_1}"
+      PORT: "${PORT}"
       DB_URI: "${DB_URI}"
       DB_NAME: inspiraspace
-      COOKIE_EXPIRE: "${COOKIE_EXPIRE}"
       SMPT_SERVICE: "${SMPT_SERVICE}"
       SMPT_HOST: "${SMPT_HOST}"
       SMPT_PORT: "${SMPT_PORT}"
@@ -35,9 +38,27 @@ services:
       CLOUDINARY_NAME: "${CLOUDINARY_NAME}"
       CLOUDINARY_APIKEY: "${CLOUDINARY_APIKEY}"
       CLOUDINARY_SECRET: "${CLOUDINARY_SECRET}"
-      DOCKER: true
+      DOCKER: "true"
     depends_on:
       - mongo_db
 
+  nginx:
+    build:
+      context: ./nginx
+    container_name: nginx
+    hostname: nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+    networks:
+      - inspiraspace-server
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+
 volumes:
   mongo_db: {}
+
+networks:
+  inspiraspace-server:
+    external: true

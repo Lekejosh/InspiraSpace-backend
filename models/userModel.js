@@ -91,6 +91,8 @@ const userSchema = new mongoose.Schema(
           "contemporary",
           "fantasy",
           "graffiti",
+          "UI/UX",
+          "NFT",
         ],
       },
     ],
