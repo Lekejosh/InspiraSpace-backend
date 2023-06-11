@@ -67,9 +67,10 @@ const order = require("./routes/orderRouter");
 const admin = require("./routes/adminRoute");
 const notification = require("./routes/notificationRoute");
 const art = require("./routes/artRoutes");
-const chat = require('./routes/chatRoute')
-const message = require('./routes/messageRoute')
+const chat = require("./routes/chatRoute");
+const message = require("./routes/messageRoute");
 const search = require("./routes/searchRoute");
+const card = require("./routes/cardRoute");
 
 app.use("/api/v1/user", user);
 app.use("/api/v1/post", post);
@@ -78,9 +79,10 @@ app.use("/api/v1/order", order);
 app.use("/api/v1/admin", admin);
 app.use("/api/v1/notification", notification);
 app.use("/api/v1/art", art);
-app.use('/api/v1/chat',chat)
-app.use('/api/v1/message', message)
+app.use("/api/v1/chat", chat);
+app.use("/api/v1/message", message);
 app.use("/api/v1/search", search);
+app.use("/api/v1/card", card);
 
 app.use(errorMiddleware);
 
