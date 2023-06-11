@@ -11,8 +11,15 @@ const cloudinary = require("cloudinary");
 const passport = require("passport");
 
 exports.registerUser = catchAsyncErrors(async (req, res, next) => {
-  const { displayName, username, email, password, mobileNumber, intrests } =
-    req.body;
+  const {
+    displayName,
+    username,
+    email,
+    password,
+    mobileNumber,
+    intrests,
+    dob,
+  } = req.body;
 
   const checkExistingUser = async (key, value) => {
     const existingUser = await User.findOne({ [key]: value });
@@ -37,6 +44,7 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
     username,
     password,
     mobileNumber,
+    dob,
     generatedOtp: generateOTP(),
     generatedOtpExpire: Date.now() + 15 * 60 * 1000,
     intrests,
@@ -48,21 +56,21 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
 
   //TODO: Remove the comment on Production
 
-  // try {
-  //   const data = `Your email Verification Token is :-\n\n ${user.generatedOtp} (This is only availbale for 15 Minutes!)\n\nif you have not requested this email  then, please Ignore it`;
-  //   await sendEmail({
-  //     email: `${user.username} <${user.email}>`,
-  //     subject: "Veritfy Account",
-  //     html: data,
-  //   }).then(() => {
-  //     console.log("Email Sent Successfully");
-  //   });
-  // } catch (err) {
-  //   user.generatedOtp = undefined;
-  //   user.generatedOtpExpire = undefined;
-  //   await user.save({ validateBeforeSave: false });
-  //   return next(new ErrorHandler(err.message, 500));
-  // }
+  try {
+    const data = `Your email Verification Token is :-\n\n ${user.generatedOtp} (This is only availbale for 15 Minutes!)\n\nif you have not requested this email  then, please Ignore it`;
+    await sendEmail({
+      email: `${user.username} <${user.email}>`,
+      subject: "Veritfy Account",
+      html: data,
+    }).then(() => {
+      console.log("Email Sent Successfully");
+    });
+  } catch (err) {
+    user.generatedOtp = undefined;
+    user.generatedOtpExpire = undefined;
+    await user.save({ validateBeforeSave: false });
+    return next(new ErrorHandler(err.message, 500));
+  }
 
   user.getAccessToken();
 

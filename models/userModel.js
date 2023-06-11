@@ -39,7 +39,9 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-
+    dob: {
+      type: Date,
+    },
     mobileNumber: {
       type: String,
     },
