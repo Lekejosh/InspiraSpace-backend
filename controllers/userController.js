@@ -54,8 +54,6 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
     },
   });
 
-  //TODO: Remove the comment on Production
-
   try {
     const data = `Your email Verification Token is :-\n\n ${user.generatedOtp} (This is only availbale for 15 Minutes!)\n\nif you have not requested this email  then, please Ignore it`;
     await sendEmail({

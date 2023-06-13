@@ -6,8 +6,9 @@
 const app = require("./app");
 const mongoose = require("mongoose");
 const cloudinary = require("cloudinary");
-const cluster = require("cluster");
-const os = require("os");
+const { key, cert } = require("./certificates");
+const https = require("https");
+const http = require("http");
 require("dotenv").config();
 require("./utils/auth");
 
@@ -33,31 +34,39 @@ const mongoURL = isDocker
   ? `${process.env.DB_URI}/${process.env.DB_NAME}`
   : `${process.env.DB_URI_1}/${process.env.DB_NAME}`;
 
-// console.log("Server is runningggg");
-// if (cluster.isMaster) {
-//   const NUM_WORKERS = os.cpus().length;
-//   console.log(NUM_WORKERS);
-//   for (let i = 0; i < NUM_WORKERS; i++) {
-//     cluster.fork();
-//   }
-// }
+
 
 mongoose
   .connect(mongoURL)
-  .then(() =>
-    app.listen(process.env.PORT, () => {
-      console.log(`Server is working on http://localhost:${process.env.PORT}`);
-    })
-  )
+  .then(() => {
+    // Create an HTTP server
+    const httpServer = http.createServer(app);
+    httpServer.listen(process.env.PORT, () => {
+      console.log(
+        `HTTP Server is working on http://localhost:${process.env.PORT}`
+      );
+    });
+
+    // Create an HTTPS server
+    const httpsServer = https.createServer({ key, cert }, app);
+    httpsServer.listen(process.env.HTTPS_PORT, () => {
+      console.log(
+        `HTTPS Server is working on https://localhost:${process.env.HTTPS_PORT}`
+      );
+    });
+  })
   .catch((err) => {
     console.error(err);
   });
 
 process.on("unhandledRejection", (err) => {
   console.log(`Error: $err: ${err.message}`);
-  console.log(`Shutting down the server due to unhandled promise Rejection`);
+  console.log(`Shutting down the server due to an unhandled promise rejection`);
 
-  server.close(() => {
-    process.exit(1);
+  // Close the servers gracefully
+  httpServer.close(() => {
+    httpsServer.close(() => {
+      process.exit(1);
+    });
   });
 });
