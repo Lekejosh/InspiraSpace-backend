@@ -13,6 +13,9 @@ const errorMiddleware = require("./middlewares/error");
 const helmet = require("helmet");
 const passport = require("passport");
 const rateLimit = require("express-rate-limit");
+const redis = require('redis')
+
+const clien = redis.createClient(process.env.REDIS)
 
 app.use(helmet());
 app.use(express.json());
