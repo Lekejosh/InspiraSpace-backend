@@ -7,6 +7,7 @@ const catchAsyncErrors = require("../middlewares/catchAsyncErrors");
 const sendToken = require("../utils/jwtToken");
 const { generateOTP } = require("../utils/otpGenerator");
 const cloudinary = require("cloudinary");
+const cache = require("../utils/cache");
 
 const passport = require("passport");
 
@@ -204,13 +205,23 @@ exports.loginUser = catchAsyncErrors(async (req, res, next) => {
 });
 
 exports.getMe = catchAsyncErrors(async (req, res, next) => {
+  const cachedUser = await cache.get(req.user._id);
+
+  if (cachedUser) {
+    const userData = JSON.parse(cachedUser);
+    return res.status(200).json(userData);
+  }
+
   const user = await User.findById(req.user._id);
-
-  if (!user) return next(new ErrorHandler("User not found", 404));
-
+  if (!user) {
+    return next(new ErrorHandler("User not found", 404));
+  }
   const post = await Post.find({ author: req.user._id }).sort("-createdAt");
+  const userData = { user, post };
 
-  res.status(200).json({ success: true, user, post });
+  cache.set(req.user._id, userData);
+
+  res.status(200).json({ success: true, user: userData });
 });
 
 exports.logoutUser = catchAsyncErrors(async (req, res, next) => {

@@ -6,6 +6,9 @@
 
 const express = require("express");
 const app = express();
+const cors = require('cors')
+const credentials = require("./middlewares/credentials");
+const corsOptions = require("./config/corsOptions");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const bodyParser = require("body-parser");
@@ -13,15 +16,15 @@ const errorMiddleware = require("./middlewares/error");
 const helmet = require("helmet");
 const passport = require("passport");
 const rateLimit = require("express-rate-limit");
-const redis = require('redis')
 
-const clien = redis.createClient(process.env.REDIS)
-
+app.use(credentials);
+app.use(cors(corsOptions));
 app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
+
 
 const limiter = rateLimit({
   windowMs: 15 * 1000,
