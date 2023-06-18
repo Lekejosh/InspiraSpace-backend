@@ -77,6 +77,7 @@ const chat = require("./routes/chatRoute");
 const message = require("./routes/messageRoute");
 const search = require("./routes/searchRoute");
 const card = require("./routes/cardRoute");
+const history = require('./routes/historyRoute')
 
 app.use("/api/v1/user", user);
 app.use("/api/v1/post", post);
@@ -89,6 +90,7 @@ app.use("/api/v1/chat", chat);
 app.use("/api/v1/message", message);
 app.use("/api/v1/search", search);
 app.use("/api/v1/card", card);
+app.use('/api/v1/history',history)
 
 app.use(errorMiddleware);
 
