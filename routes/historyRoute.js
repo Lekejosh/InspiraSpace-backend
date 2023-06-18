@@ -2,13 +2,13 @@ const express = require('express')
 
 const router = express.Router()
 
-const { deleteHistory, getAllSearchHistory } = require('../controllers/historyController')
+const { deleteHistory, getAllHistoryByType } = require('../controllers/historyController')
 
 const { isAuthenticatedUser, deactivated } = require('../middlewares/auth')
 
 router.route('/:historyId').delete(isAuthenticatedUser,deactivated,deleteHistory)
 router
   .route("/")
-  .get(isAuthenticatedUser, deactivated, getAllSearchHistory);
+  .get(isAuthenticatedUser, deactivated, getAllHistoryByType);
 
 module.exports = router

@@ -6,7 +6,7 @@
 
 const express = require("express");
 const app = express();
-const cors = require('cors')
+const cors = require("cors");
 const credentials = require("./middlewares/credentials");
 const corsOptions = require("./config/corsOptions");
 const cookieParser = require("cookie-parser");
@@ -24,7 +24,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
-
 
 const limiter = rateLimit({
   windowMs: 15 * 1000,
@@ -77,7 +76,8 @@ const chat = require("./routes/chatRoute");
 const message = require("./routes/messageRoute");
 const search = require("./routes/searchRoute");
 const card = require("./routes/cardRoute");
-const history = require('./routes/historyRoute')
+const history = require("./routes/historyRoute");
+const wallet = require("./routes/walletRoute");
 
 app.use("/api/v1/user", user);
 app.use("/api/v1/post", post);
@@ -90,7 +90,8 @@ app.use("/api/v1/chat", chat);
 app.use("/api/v1/message", message);
 app.use("/api/v1/search", search);
 app.use("/api/v1/card", card);
-app.use('/api/v1/history',history)
+app.use("/api/v1/history", history);
+app.use("/api/v1/wallet", wallet);
 
 app.use(errorMiddleware);
 

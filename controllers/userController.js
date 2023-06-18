@@ -1,4 +1,5 @@
 const User = require("../models/userModel");
+const Wallet = require("../models/walletModel");
 const Post = require("../models/postModel");
 const crypto = require("crypto");
 const ErrorHandler = require("../utils/errorHandler");
@@ -10,6 +11,7 @@ const cloudinary = require("cloudinary");
 const cache = require("../utils/cache");
 
 const passport = require("passport");
+const walletModel = require("../models/walletModel");
 
 exports.registerUser = catchAsyncErrors(async (req, res, next) => {
   const {
@@ -53,6 +55,10 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
       public_id: "test",
       url: "www.example.code",
     },
+  });
+
+  await Wallet.create({
+    user: user._id,
   });
 
   try {

@@ -26,8 +26,14 @@ exports.deleteHistory = catchAsyncErrors(async (req, res, next) => {
     .json({ success: true, message: "History deleted successfully" });
 });
 
-exports.getAllSearchHistory = catchAsyncErrors(async (req, res, next) => {
-  const history = await History.find({ user: req.user._id, type: "search" });
+exports.getAllHistoryByType = catchAsyncErrors(async (req, res, next) => {
+  const { type } = req.query;
+
+  if (!type) {
+    return next(new ErrorHandler("Type not Specified", 422));
+  }
+
+  const history = await History.find({ user: req.user._id, type: type });
 
   if (!history) {
     return next(new ErrorHandler("No search History found"));
