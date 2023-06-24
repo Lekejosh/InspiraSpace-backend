@@ -48,6 +48,22 @@ exports.createPost = catchAsyncErrors(async (req, res, next) => {
   res.status(201).json({ success: true, message: "Post created", post });
 });
 
+exports.getPost = catchAsyncErrors(async (req, res, next) => {
+  const { postId } = req.params;
+
+  if (!postId) {
+    return next(new ErrorHandler("Post Id not specified", 422));
+  }
+
+  const post = await Post.findById(postId);
+
+  if (!post) {
+    return next(new ErrorHandler("Post not found", 404));
+  }
+
+  res.status(200).json({ success: true, post });
+});
+
 exports.editPost = catchAsyncErrors(async (req, res, next) => {
   const { title, description } = req.body;
   const { postId } = req.params;
@@ -214,7 +230,13 @@ exports.createPostReview = catchAsyncErrors(async (req, res, next) => {
 });
 
 exports.getPostReviews = catchAsyncErrors(async (req, res, next) => {
-  const post = await Post.findById(req.params.postId);
+  const { postId } = req.params;
+
+  if (!postId) {
+    return next(new ErrorHandler("Post Id not specified", 422));
+  }
+
+  const post = await Post.findById(postId);
 
   if (!post) {
     return next(new ErrorHandler("Art Not found", 404));

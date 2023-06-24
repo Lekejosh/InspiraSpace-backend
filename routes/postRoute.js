@@ -11,6 +11,7 @@ const {
   createPostReview,
   getPostReviews,
   deletePostReview,
+  getPost,
 } = require("../controllers/postController");
 
 const { isAuthenticatedUser } = require("../middlewares/auth");
@@ -18,6 +19,7 @@ const { isAuthenticatedUser } = require("../middlewares/auth");
 router
   .route("/")
   .post(isAuthenticatedUser, upload.array("images", 5), createPost);
+router.route("/:postId").get(isAuthenticatedUser, getPost);
 router
   .route("/edit/:postId")
   .put(isAuthenticatedUser, editPost)

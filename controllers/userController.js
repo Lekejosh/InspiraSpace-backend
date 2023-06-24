@@ -67,9 +67,7 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
       email: `${user.username} <${user.email}>`,
       subject: "Veritfy Account",
       html: data,
-    }).then(() => {
-      console.log("Email Sent Successfully");
-    });
+    })
   } catch (err) {
     user.generatedOtp = undefined;
     user.generatedOtpExpire = undefined;
@@ -390,6 +388,10 @@ exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
     .createHash("sha256")
     .update(req.params.token)
     .digest("hex");
+
+     if (!req.body.newPassword || !req.body.confirmPassword) {
+       return next(new ErrorHandler("Credentials not provided", 422));
+     }
 
   const user = await User.findOne({
     resetPasswordToken,

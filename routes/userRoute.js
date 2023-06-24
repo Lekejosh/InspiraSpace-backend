@@ -21,6 +21,7 @@ const {
   changeUsername,
   getMe,
   getUser,
+  updatePassword,
 } = require("../controllers/userController");
 const { isAuthenticatedUser, deactivated } = require("../middlewares/auth");
 
@@ -40,6 +41,7 @@ router
   .get(isAuthenticatedUser, deactivated, resendOtp);
 router.route("/password/forgot").get(forgotPassword);
 router.route("/password/reset/:token").put(resetPassword);
+router.route('/update/password').put(isAuthenticatedUser,deactivated,updatePassword)
 router
   .route("/update/avatar")
   .put(upload.single("avatar"), isAuthenticatedUser, deactivated, updateAvatar)
